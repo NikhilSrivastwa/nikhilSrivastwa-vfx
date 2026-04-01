@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nikhil Srivastwa | Lead VFX Compositor</title>
+
+  <!-- =====================================================
+       FONTS: Cinzel (display) + DM Mono (code) + Outfit (body)
+       ===================================================== -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;900&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =========================================================
+       CSS CUSTOM PROPERTIES — Edit these to retheme the site
+       ========================================================= */
+    :root {
+      --black:        #050608;
+      --surface-0:    #0b0d10;
+      --surface-1:    #111418;
+      --surface-2:    #191d24;
+      --surface-3:    #232830;
+      --border:       rgba(255,255,255,0.07);
+      --border-glow:  rgba(255,200,80,0.25);
+      --amber:        #f5a623;
+      --amber-dim:    #c07d10;
+      --amber-glow:   rgba(245,166,35,0.15);
+      --white:        #f0ece4;
+      --muted:        #7a8290;
+      --muted2:       #4a515e;
+      --font-display: 'Cinzel', serif;
+      --font-body:    'Outfit', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+      --nav-h:        68px;
+      --radius:       4px;
+      --transition:   0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* =========================================================
+       RESET & BASE
+       ========================================================= */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: var(--font-body);
+      font-weight: 300;
+      line-height: 1.7;
+      overflow-x: hidden;
+      cursor: none; /* custom cursor */
+    }
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+    section { position: relative; }
+    ::selection { background: var(--amber); color: var(--black); }
+
+    /* =========================================================
+       CUSTOM CURSOR
+       ========================================================= */
+    #cursor-dot, #cursor-ring {
+      position: fixed; top: 0; left: 0;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: opacity 0.3s;
+    }
+    #cursor-dot {
+      width: 6px; height: 6px;
+      background: var(--amber);
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(245,166,35,0.6);
+      transition: width 0.2s, height 0.2s, border-color 0.2s;
+    }
+    body:hover #cursor-dot, body:hover #cursor-ring { opacity: 1; }
+
+    /* =========================================================
+       NOISE OVERLAY (cinematic grain)
+       ========================================================= */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 180px;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: 0.55;
+    }
+
+    /* =========================================================
+       SCROLLBAR
+       ========================================================= */
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--amber-dim); border-radius: 2px; }
+
+    /* =========================================================
+       UTILITY CLASSES
+       ========================================================= */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 clamp(20px, 5vw, 60px);
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      max-width: 60px;
+      height: 1px;
+      background: var(--amber);
+      opacity: 0.5;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-bottom: 48px;
+    }
+    .amber { color: var(--amber); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      border-radius: var(--radius);
+      transition: var(--transition);
+      cursor: none;
+    }
+    .btn-primary {
+      background: var(--amber);
+      color: var(--black);
+      font-weight: 500;
+    }
+    .btn-primary:hover {
+      background: #ffc44a;
+      box-shadow: 0 0 30px rgba(245,166,35,0.4);
+    }
+    .btn-ghost {
+      border: 1px solid var(--border-glow);
+      color: var(--amber);
+      background: transparent;
+    }
+    .btn-ghost:hover {
+      background: var(--amber-glow);
+      border-color: var(--amber);
+    }
+
+    /* =========================================================
+       DIVIDER
+       ========================================================= */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0;
+    }
+
+    /* =========================================================
+       NAVIGATION
+       ========================================================= */
+    #nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      height: var(--nav-h);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      transition: background 0.4s, backdrop-filter 0.4s, border-bottom 0.4s;
+    }
+    #nav.scrolled {
+      background: rgba(5,6,8,0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--white);
+    }
+    .nav-logo span { color: var(--amber); }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 36px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      position: relative;
+      transition: color 0.25s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0; right: 100%;
+      height: 1px;
+      background: var(--amber);
+      transition: right 0.3s ease;
+    }
+    .nav-links a:hover { color: var(--white); }
+    .nav-links a:hover::after { right: 0; }
+
+    /* Hamburger */
+    .nav-toggle {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: none;
+      padding: 4px;
+    }
+    .nav-toggle span {
+      width: 26px; height: 1.5px;
+      background: var(--white);
+      transition: var(--transition);
+    }
+    .nav-toggle.open span:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    .nav-toggle.open span:nth-child(2) { opacity: 0; }
+    .nav-toggle.open span:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+
+    /* Mobile nav drawer */
+    .nav-mobile {
+      display: none;
+      position: fixed;
+      top: var(--nav-h); left: 0; right: 0;
+      background: rgba(5,6,8,0.97);
+      backdrop-filter: blur(20px);
+      padding: 32px clamp(20px, 5vw, 60px);
+      flex-direction: column;
+      gap: 24px;
+      border-bottom: 1px solid var(--border);
+      z-index: 999;
+    }
+    .nav-mobile.open { display: flex; }
+    .nav-mobile a {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      transition: color 0.25s;
+    }
+    .nav-mobile a:hover { color: var(--amber); }
+
+    /* =========================================================
+       HERO SECTION
+       ========================================================= */
+    #home {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding-top: var(--nav-h);
+    }
+
+    /* ── VIDEO / IMAGE BACKGROUND ────────────────────────────
+       Replace the gradient with a <video> or <img> element.
+       See the HTML markup below in the hero section.
+       ──────────────────────────────────────────────────────── */
+    .hero-bg {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 40%, rgba(20,25,35,0.3) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 80% at 20% 80%, rgba(245,166,35,0.04) 0%, transparent 60%),
+        linear-gradient(180deg, #090b0f 0%, #0b0e14 50%, #050608 100%);
+      /* ↑ This is the placeholder background. Once you have a
+         showreel video, add a <video> tag inside .hero-bg and
+         set it to autoplay muted loop. */
+    }
+
+    /* Cinematic horizontal scan lines */
+    .hero-bg::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,0.08) 3px,
+        rgba(0,0,0,0.08) 4px
+      );
+      pointer-events: none;
+    }
+
+    /* Wide amber accent line */
+    .hero-accent-line {
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+      opacity: 0.4;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 40px 20px;
+      max-width: 900px;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 28px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.2s forwards;
+    }
+    .hero-name {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 9vw, 7.5rem);
+      font-weight: 900;
+      line-height: 0.95;
+      letter-spacing: -0.01em;
+      margin-bottom: 24px;
+      opacity: 0;
+      animation: fadeUp 0.9s 0.4s forwards;
+    }
+    .hero-name .line-1 { display: block; color: var(--white); }
+    .hero-name .line-2 { display: block; color: var(--amber); }
+    .hero-title {
+      font-size: clamp(0.85rem, 2vw, 1rem);
+      font-weight: 300;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 48px;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.6s forwards;
+    }
+    .hero-cta {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp 0.8s 0.8s forwards;
+    }
+
+    /* Play button circle */
+    .play-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 36px;
+      border: 1px solid var(--amber);
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--amber);
+      background: var(--amber-glow);
+      transition: var(--transition);
+      cursor: none;
+      position: relative;
+      overflow: hidden;
+    }
+    .play-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--amber);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+      z-index: 0;
+    }
+    .play-btn:hover::before { transform: scaleX(1); }
+    .play-btn:hover { color: var(--black); }
+    .play-btn > * { position: relative; z-index: 1; }
+    .play-icon {
+      width: 0; height: 0;
+      border-top: 7px solid transparent;
+      border-bottom: 7px solid transparent;
+      border-left: 12px solid currentColor;
+      flex-shrink: 0;
+    }
+
+    /* Scroll indicator */
+    .hero-scroll {
+      position: absolute;
+      bottom: 36px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeIn 1s 1.4s forwards;
+    }
+    .hero-scroll span {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .scroll-line {
+      width: 1px;
+      height: 48px;
+      background: linear-gradient(180deg, var(--amber), transparent);
+      animation: scrollPulse 2s infinite;
+    }
+
+    /* =========================================================
+       ABOUT SECTION
+       ========================================================= */
+    #about {
+      padding: clamp(80px, 10vw, 140px) 0;
+      background: var(--surface-0);
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: clamp(40px, 6vw, 100px);
+      align-items: start;
+    }
+    .about-portrait {
+      position: relative;
+    }
+    .portrait-frame {
+      position: relative;
+      aspect-ratio: 3/4;
+      max-height: 560px;
+      overflow: hidden;
+      border-radius: var(--radius);
+    }
+    /* ── PORTRAIT IMAGE ──────────────────────────────────────
+       Replace the gradient placeholder with your headshot:
+         <img src="YOUR_PHOTO.jpg" alt="Nikhil Srivastwa" ... />
+       ──────────────────────────────────────────────────────── */
+    .portrait-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(160deg, var(--surface-2) 0%, var(--surface-1) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--muted2);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+    }
+    .portrait-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      object-position: top center;
+    }
+    /* Decorative corner frames */
+    .portrait-frame::before, .portrait-frame::after {
+      content: '';
+      position: absolute;
+      width: 40px; height: 40px;
+      border-color: var(--amber);
+      border-style: solid;
+      opacity: 0.6;
+      z-index: 2;
+    }
+    .portrait-frame::before { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+    .portrait-frame::after  { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+    /* Floating stats badge */
+    .about-badge {
+      position: absolute;
+      bottom: -20px; right: -20px;
+      background: var(--amber);
+      color: var(--black);
+      padding: 20px 24px;
+      border-radius: var(--radius);
+      text-align: center;
+    }
+    .about-badge-num {
+      font-family: var(--font-display);
+      font-size: 2.4rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .about-badge-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .about-text { padding-top: 8px; }
+    .about-bio {
+      color: var(--muted);
+      font-size: 0.97rem;
+      line-height: 1.85;
+      margin-bottom: 36px;
+    }
+    .about-bio strong { color: var(--white); font-weight: 500; }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 36px;
+    }
+    .skill-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .skill-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--amber);
+      flex-shrink: 0;
+    }
+
+    /* =========================================================
+       PORTFOLIO GALLERY
+       ========================================================= */
+    #portfolio {
+      padding: clamp(80px, 10vw, 140px) 0;
+      background: var(--black);
+    }
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 500px), 1fr));
+      gap: 2px;
+    }
+
+    /* ── BEFORE / AFTER SLIDER ──────────────────────────────
+       Each .shot-card contains:
+         .shot-before → your ORIGINAL plate / raw footage
+         .shot-after  → your FINAL composite
+       Drag the slider handle left/right to reveal.
+       Replace the gradient placeholders with <img> or <video>.
+       ──────────────────────────────────────────────────────── */
+    .shot-card {
+      position: relative;
+      aspect-ratio: 16/9;
+      overflow: hidden;
+      background: var(--surface-1);
+      cursor: ew-resize;
+    }
+    .shot-card:hover .shot-overlay { opacity: 0; }
+
+    .shot-before, .shot-after {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+    }
+
+    /* Placeholder colours — swap these for real images */
+    .shot-card:nth-child(1) .shot-after  { background: linear-gradient(135deg,#0d1520 0%,#1a2535 50%,#0a1018 100%); }
+    .shot-card:nth-child(1) .shot-before { background: linear-gradient(135deg,#1c1c1c 0%,#2e2e2e 100%); }
+    .shot-card:nth-child(2) .shot-after  { background: linear-gradient(135deg,#12100e 0%,#2c1810 50%,#0e0c0a 100%); }
+    .shot-card:nth-child(2) .shot-before { background: linear-gradient(135deg,#1a1a1a 0%,#2a2520 100%); }
+    .shot-card:nth-child(3) .shot-after  { background: linear-gradient(135deg,#091520 0%,#0f2535 50%,#060e18 100%); }
+    .shot-card:nth-child(3) .shot-before { background: linear-gradient(135deg,#1e1e1e 0%,#262626 100%); }
+    .shot-card:nth-child(4) .shot-after  { background: linear-gradient(135deg,#10150d 0%,#1a2512 50%,#0a100a 100%); }
+    .shot-card:nth-child(4) .shot-before { background: linear-gradient(135deg,#1a1a1a 0%,#252820 100%); }
+
+    /* The AFTER image sits on top; we clip it to reveal BEFORE */
+    .shot-after {
+      z-index: 2;
+      /* clip-path is set dynamically via JS */
+      clip-path: inset(0 50% 0 0);
+    }
+
+    /* Divider handle */
+    .shot-handle {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%; /* updated by JS */
+      width: 2px;
+      background: var(--amber);
+      z-index: 3;
+      transform: translateX(-50%);
+      transition: left 0s; /* no transition during drag */
+    }
+    .shot-handle-circle {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--amber);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 20px rgba(245,166,35,0.5);
+    }
+    .shot-handle-arrows {
+      display: flex;
+      gap: 2px;
+      color: var(--black);
+      font-size: 0.7rem;
+      font-weight: 700;
+    }
+
+    /* Shot label chips */
+    .shot-label-before, .shot-label-after {
+      position: absolute;
+      top: 14px;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 2px;
+      z-index: 4;
+      pointer-events: none;
+    }
+    .shot-label-before { left: 14px; background: rgba(0,0,0,0.6); color: var(--muted); }
+    .shot-label-after  { right: 14px; background: var(--amber); color: var(--black); }
+
+    /* Shot info overlay */
+    .shot-info {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 40px 20px 18px;
+      background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%);
+      z-index: 4;
+      pointer-events: none;
+    }
+    .shot-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      letter-spacing: 0.04em;
+      color: var(--white);
+    }
+    .shot-meta {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      color: var(--amber);
+      margin-top: 4px;
+    }
+
+    /* =========================================================
+       GIZMOS & CODE
+       ========================================================= */
+    #gizmos {
+      padding: clamp(80px, 10vw, 140px) 0;
+      background: var(--surface-0);
+    }
+    .code-repo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+      gap: 16px;
+    }
+    .repo-card {
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: border-color var(--transition), box-shadow var(--transition);
+    }
+    .repo-card:hover {
+      border-color: rgba(245,166,35,0.3);
+      box-shadow: 0 0 30px rgba(245,166,35,0.06);
+    }
+    .repo-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface-2);
+    }
+    .repo-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .repo-dot-r { background: #ff5f57; }
+    .repo-dot-y { background: #ffbd2e; }
+    .repo-dot-g { background: #28c940; }
+    .repo-filename {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-left: 4px;
+    }
+    .repo-code {
+      padding: 20px 18px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      line-height: 1.9;
+      color: #8fafc0;
+      overflow-x: auto;
+      white-space: pre;
+      tab-size: 2;
+    }
+    /* ── CODE HIGHLIGHTING ──────────────────────────────────
+       Basic token colours for readability.
+       ──────────────────────────────────────────────────────── */
+    .tok-kw  { color: #c099ff; }
+    .tok-fn  { color: #82aaff; }
+    .tok-str { color: #c3e88d; }
+    .tok-cm  { color: #444f63; font-style: italic; }
+    .tok-nb  { color: #f78c6c; }
+    .tok-num { color: #f78c6c; }
+
+    .repo-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 18px;
+      border-top: 1px solid var(--border);
+    }
+    .repo-tags {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+      background: var(--surface-3);
+      color: var(--amber);
+      border: 1px solid var(--border-glow);
+    }
+    .repo-download {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--amber);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: opacity 0.2s;
+      cursor: none;
+    }
+    .repo-download:hover { opacity: 0.7; }
+    .dl-icon { font-size: 0.9rem; }
+
+    /* =========================================================
+       AI R&D
+       ========================================================= */
+    #ailab {
+      padding: clamp(80px, 10vw, 140px) 0;
+      background: var(--black);
+    }
+    .ailab-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .ai-card {
+      position: relative;
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface-1);
+      border: 1px solid var(--border);
+      transition: border-color var(--transition), transform var(--transition);
+      cursor: none;
+    }
+    .ai-card:hover {
+      border-color: rgba(245,166,35,0.25);
+      transform: translateY(-4px);
+    }
+    /* Featured card takes full width of first row */
+    .ai-card.featured {
+      grid-column: span 2;
+    }
+    /* ── AI R&D IMAGES ───────────────────────────────────────
+       Replace .ai-img-placeholder background-colors with:
+         <img src="YOUR_AI_OUTPUT.jpg" alt="..." class="ai-img" />
+       ──────────────────────────────────────────────────────── */
+    .ai-img-placeholder {
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #0d1520 0%, #111d2e 100%);
+      position: relative;
+      overflow: hidden;
+    }
+    .ai-card.featured .ai-img-placeholder { aspect-ratio: 21/9; }
+    .ai-img-placeholder .placeholder-text {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: var(--muted2);
+      text-align: center;
+    }
+    .ai-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .ai-card-body {
+      padding: 18px 20px 20px;
+    }
+    .ai-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 2px;
+      background: var(--amber-glow);
+      color: var(--amber);
+      border: 1px solid var(--border-glow);
+      margin-bottom: 10px;
+    }
+    .ai-title {
+      font-family: var(--font-display);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    .ai-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* =========================================================
+       CONTACT FOOTER
+       ========================================================= */
+    #contact {
+      padding: clamp(80px, 10vw, 120px) 0 0;
+      background: var(--surface-0);
+    }
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 60px;
+      align-items: start;
+      padding-bottom: 60px;
+    }
+    .contact-heading {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 5vw, 4rem);
+      font-weight: 900;
+      line-height: 1.05;
+      color: var(--white);
+    }
+    .contact-heading em {
+      display: block;
+      color: var(--amber);
+      font-style: normal;
+    }
+    .contact-links {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-top: 8px;
+    }
+    .contact-link-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 20px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color var(--transition), background var(--transition);
+      cursor: none;
+    }
+    .contact-link-item:hover {
+      border-color: rgba(245,166,35,0.3);
+      background: var(--amber-glow);
+    }
+    .contact-link-icon {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .contact-link-text { flex: 1; }
+    .contact-link-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .contact-link-value {
+      font-size: 0.88rem;
+      color: var(--white);
+      margin-top: 2px;
+    }
+    .contact-link-arrow {
+      color: var(--amber);
+      font-size: 1rem;
+      opacity: 0;
+      transition: opacity 0.2s, transform 0.2s;
+    }
+    .contact-link-item:hover .contact-link-arrow {
+      opacity: 1;
+      transform: translateX(4px);
+    }
+
+    /* Footer bar */
+    .footer-bar {
+      border-top: 1px solid var(--border);
+      padding: 24px 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font-family: var(--font-mono);
+      font-size: 0.67rem;
+      letter-spacing: 0.1em;
+      color: var(--muted2);
+    }
+    .footer-craft {
+      font-family: var(--font-mono);
+      font-size: 0.67rem;
+      letter-spacing: 0.08em;
+      color: var(--muted2);
+    }
+    .footer-craft span { color: var(--amber); }
+
+    /* =========================================================
+       ANIMATIONS
+       ========================================================= */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(0.8); transform-origin: top; }
+      50%       { opacity: 1;   transform: scaleY(1);   transform-origin: top; }
+    }
+
+    /* Scroll-reveal */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* =========================================================
+       RESPONSIVE — MOBILE
+       ========================================================= */
+    @media (max-width: 900px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .about-portrait { max-width: 400px; margin: 0 auto 60px; }
+      .about-badge { right: 0; }
+      .ailab-grid { grid-template-columns: 1fr 1fr; }
+      .ai-card.featured { grid-column: span 2; }
+      .contact-inner { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .nav-toggle { display: flex; }
+      .ailab-grid { grid-template-columns: 1fr; }
+      .ai-card.featured { grid-column: span 1; }
+      .portfolio-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .footer-bar { flex-direction: column; text-align: center; }
+    }
+    @media (max-width: 480px) {
+      .code-repo-grid { grid-template-columns: 1fr; }
+    }
+
+    /* =========================================================
+       MODAL (showreel overlay)
+       ========================================================= */
+    #showreel-modal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.95);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+      backdrop-filter: blur(12px);
+    }
+    #showreel-modal.open { display: flex; }
+    .modal-inner {
+      position: relative;
+      width: min(90vw, 1000px);
+    }
+    .modal-close {
+      position: absolute;
+      top: -48px; right: 0;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+    .modal-close:hover { color: var(--amber); }
+    .modal-video-wrap {
+      aspect-ratio: 16/9;
+      background: var(--surface-1);
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* ── SHOWREEL VIDEO ──────────────────────────────────────
+       Replace .modal-video-placeholder with:
+         <video src="YOUR_SHOWREEL.mp4" controls autoplay .../>
+       or embed a Vimeo / YouTube iframe.
+       ──────────────────────────────────────────────────────── */
+    .modal-video-placeholder {
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, var(--surface-2), var(--surface-1));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.1em;
+      text-align: center;
+      padding: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       CUSTOM CURSOR
+       ============================================================ -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- ============================================================
+       SHOWREEL MODAL
+       Replace .modal-video-placeholder with a <video> or iframe.
+       ============================================================ -->
+  <div id="showreel-modal" role="dialog" aria-modal="true" aria-label="Showreel">
+    <div class="modal-inner">
+      <button class="modal-close" id="modal-close-btn">✕ &nbsp;Close</button>
+      <div class="modal-video-wrap">
+        <!-- ↓ REPLACE THIS WITH YOUR VIDEO -->
+        <div class="modal-video-placeholder">
+          <div style="font-size:3rem;">▶</div>
+          <div>
+            Drop your showreel video here.<br>
+            Use a &lt;video&gt; tag or Vimeo / YouTube iframe.
+          </div>
+        </div>
+        <!-- Example Vimeo embed (uncomment & add your video ID):
+        <iframe src="https://player.vimeo.com/video/YOUR_VIDEO_ID?autoplay=1"
+          width="100%" height="100%" frameborder="0"
+          allow="autoplay; fullscreen" allowfullscreen></iframe>
+        -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       NAVIGATION
+       ============================================================ -->
+  <nav id="nav" aria-label="Main navigation">
+    <div class="container">
+      <div class="nav-inner">
+        <!-- Logo — edit your initials or full name here -->
+        <a href="#home" class="nav-logo">NS<span>.</span></a>
+
+        <ul class="nav-links">
+          <li><a href="#home">Home</a></li>
+          <li><a href="#about">About</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#gizmos">Gizmos & Code</a></li>
+          <li><a href="#ailab">AI R&D</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+
+        <!-- Mobile hamburger -->
+        <button class="nav-toggle" id="nav-toggle" aria-label="Toggle menu">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mobile nav drawer -->
+  <div class="nav-mobile" id="nav-mobile">
+    <a href="#home"      onclick="closeMobileNav()">Home</a>
+    <a href="#about"     onclick="closeMobileNav()">About</a>
+    <a href="#portfolio" onclick="closeMobileNav()">Portfolio</a>
+    <a href="#gizmos"    onclick="closeMobileNav()">Gizmos & Code</a>
+    <a href="#ailab"     onclick="closeMobileNav()">AI R&D</a>
+    <a href="#contact"   onclick="closeMobileNav()">Contact</a>
+  </div>
+
+  <!-- ============================================================
+       HERO SECTION
+       ============================================================ -->
+  <section id="home">
+    <!-- Background — swap gradient for <video> showreel loop -->
+    <div class="hero-bg">
+      <!-- ↓ OPTIONAL: Add a looping background video here:
+      <video autoplay muted loop playsinline
+        style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.35;">
+        <source src="YOUR_BG_VIDEO.mp4" type="video/mp4">
+      </video>
+      -->
+    </div>
+    <div class="hero-accent-line"></div>
+
+    <div class="hero-content">
+      <!-- Eyebrow label -->
+      <p class="hero-eyebrow">Lead VFX Compositor · Python Enthusiast</p>
+
+      <!-- Main name — edit as needed -->
+      <h1 class="hero-name">
+        <span class="line-1">Nikhil</span>
+        <span class="line-2">Srivastwa</span>
+      </h1>
+
+      <!-- Subtitle -->
+      <p class="hero-title">
+        12+ Years · 2D/CG Compositing · Unreal Engine · Pipeline Tools
+      </p>
+
+      <!-- CTAs -->
+      <div class="hero-cta">
+        <!-- Play Showreel button — opens the modal above -->
+        <button class="play-btn" id="play-showreel-btn" aria-label="Play showreel">
+          <span class="play-icon"></span>
+          Play Showreel
+        </button>
+        <a href="#portfolio" class="btn btn-ghost">View Work</a>
+      </div>
+    </div>
+
+    <!-- Scroll indicator -->
+    <div class="hero-scroll">
+      <span>Scroll</span>
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ============================================================
+       ABOUT SECTION
+       ============================================================ -->
+  <section id="about">
+    <div class="container">
+      <div class="about-grid">
+
+        <!-- Portrait column -->
+        <div class="about-portrait reveal">
+          <div class="portrait-frame">
+            <!-- ↓ REPLACE with your headshot image:
+            <img src="YOUR_PHOTO.jpg" alt="Nikhil Srivastwa" class="portrait-img" />
+            -->
+            <div class="portrait-placeholder">
+              [ Your portrait photo ]<br>
+              <span style="font-size:0.6rem;margin-top:8px;display:block;">Recommended: 600×800px</span>
+            </div>
+          </div>
+          <!-- Floating badge -->
+          <div class="about-badge">
+            <div class="about-badge-num">12+</div>
+            <div class="about-badge-label">Years<br>Experience</div>
+          </div>
+        </div>
+
+        <!-- Text column -->
+        <div class="about-text reveal">
+          <p class="section-label">About Me</p>
+          <h2 class="section-title">Crafting Worlds,<br>One Composite at a Time</h2>
+
+          <p class="about-bio">
+            I'm <strong>Nikhil Srivastwa</strong>, a Lead VFX Compositor with over
+            <strong>12 years of experience</strong> delivering high-end visual effects
+            for feature films, episodic television, and commercial productions.
+            My work spans the full compositing pipeline — from <strong>beauty work
+            and colour grading</strong> to complex <strong>CG integration,
+            matte painting</strong>, and <strong>crowd simulations</strong>.
+          </p>
+          <p class="about-bio">
+            Beyond the comp, I'm passionate about <strong>Python scripting</strong> and
+            building bespoke pipeline tools in <strong>Nuke</strong> — Gizmos that
+            solve real production problems and free artists to focus on what matters.
+            I've been exploring <strong>Unreal Engine</strong> for real-time VFX,
+            virtual production workflows, and <strong>AI-driven image generation</strong>
+            with ComfyUI and Stable Diffusion.
+          </p>
+
+          <!-- Skills grid — add or remove items as needed -->
+          <div class="skills-grid">
+            <div class="skill-item"><div class="skill-dot"></div>Nuke / NukeX</div>
+            <div class="skill-item"><div class="skill-dot"></div>Nuke Python / Gizmos</div>
+            <div class="skill-item"><div class="skill-dot"></div>2D / CG Compositing</div>
+            <div class="skill-item"><div class="skill-dot"></div>Unreal Engine 5</div>
+            <div class="skill-item"><div class="skill-dot"></div>Pipeline Automation</div>
+            <div class="skill-item"><div class="skill-dot"></div>ComfyUI / Stable Diffusion</div>
+            <div class="skill-item"><div class="skill-dot"></div>Colour Science</div>
+            <div class="skill-item"><div class="skill-dot"></div>Virtual Production</div>
+          </div>
+
+          <a href="#contact" class="btn btn-primary">Get in Touch</a>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ============================================================
+       PORTFOLIO GALLERY — Before & After Slider
+       ============================================================ -->
+  <section id="portfolio">
+    <div class="container">
+      <p class="section-label reveal">Selected Work</p>
+      <h2 class="section-title reveal">Portfolio</h2>
+    </div>
+
+    <!--
+      HOW TO CUSTOMISE SHOTS:
+      1. Add your images to .shot-before and .shot-after via inline style or class:
+           style="background-image: url('before.jpg')"
+         OR replace divs with <img> and position them absolutely.
+      2. Edit .shot-title and .shot-meta text.
+      3. Drag the slider to reveal before/after.
+      Add or remove .shot-card blocks as needed.
+    -->
+    <div class="portfolio-grid">
+
+      <!-- SHOT 1 -->
+      <div class="shot-card" data-slider>
+        <div class="shot-before">
+          <!-- ↓ REPLACE: style="background-image: url('shot1_before.jpg')" -->
+        </div>
+        <div class="shot-after">
+          <!-- ↓ REPLACE: style="background-image: url('shot1_after.jpg')" -->
+        </div>
+        <div class="shot-handle">
+          <div class="shot-handle-circle">
+            <div class="shot-handle-arrows">◀▶</div>
+          </div>
+        </div>
+        <div class="shot-label-before">RAW</div>
+        <div class="shot-label-after">FINAL</div>
+        <div class="shot-info">
+          <div class="shot-title">Feature Film · CG Environment Integration</div>
+          <div class="shot-meta">Nuke · 2024</div>
+        </div>
+      </div>
+
+      <!-- SHOT 2 -->
+      <div class="shot-card" data-slider>
+        <div class="shot-before"></div>
+        <div class="shot-after"></div>
+        <div class="shot-handle">
+          <div class="shot-handle-circle">
+            <div class="shot-handle-arrows">◀▶</div>
+          </div>
+        </div>
+        <div class="shot-label-before">RAW</div>
+        <div class="shot-label-after">FINAL</div>
+        <div class="shot-info">
+          <div class="shot-title">Episodic TV · Crowd & Sky Replacement</div>
+          <div class="shot-meta">Nuke · 2023</div>
+        </div>
+      </div>
+
+      <!-- SHOT 3 -->
+      <div class="shot-card" data-slider>
+        <div class="shot-before"></div>
+        <div class="shot-after"></div>
+        <div class="shot-handle">
+          <div class="shot-handle-circle">
+            <div class="shot-handle-arrows">◀▶</div>
+          </div>
+        </div>
+        <div class="shot-label-before">RAW</div>
+        <div class="shot-label-after">FINAL</div>
+        <div class="shot-info">
+          <div class="shot-title">Commercial · Matte Painting & Grade</div>
+          <div class="shot-meta">Nuke · 2023</div>
+        </div>
+      </div>
+
+      <!-- SHOT 4 -->
+      <div class="shot-card" data-slider>
+        <div class="shot-before"></div>
+        <div class="shot-after"></div>
+        <div class="shot-handle">
+          <div class="shot-handle-circle">
+            <div class="shot-handle-arrows">◀▶</div>
+          </div>
+        </div>
+        <div class="shot-label-before">RAW</div>
+        <div class="shot-label-after">FINAL</div>
+        <div class="shot-info">
+          <div class="shot-title">Unreal Engine · Virtual Production Comp</div>
+          <div class="shot-meta">Nuke · UE5 · 2024</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ============================================================
+       GIZMOS & CODE
+       ============================================================ -->
+  <section id="gizmos">
+    <div class="container">
+      <p class="section-label reveal">Tools & Scripts</p>
+      <h2 class="section-title reveal">Gizmos & Code</h2>
+
+      <!--
+        HOW TO CUSTOMISE:
+        • Edit the code inside <span> tags — use tok-kw, tok-fn,
+          tok-str, tok-cm, tok-nb, tok-num for syntax colouring.
+        • Update .repo-filename, tags, and download href.
+        • Add more .repo-card blocks to showcase additional scripts.
+      -->
+      <div class="code-repo-grid">
+
+        <!-- CARD 1 -->
+        <div class="repo-card reveal">
+          <div class="repo-header">
+            <div class="repo-dot repo-dot-r"></div>
+            <div class="repo-dot repo-dot-y"></div>
+            <div class="repo-dot repo-dot-g"></div>
+            <span class="repo-filename">ns_smart_grade.py</span>
+          </div>
+          <div class="repo-code"><span class="tok-cm"># Smart Grade Gizmo — auto-balances
+# shadows, mids, and highs via luma key</span>
+
+<span class="tok-kw">import</span> nuke
+
+<span class="tok-kw">def</span> <span class="tok-fn">create_smart_grade</span>():
+  g = nuke.<span class="tok-fn">createNode</span>(<span class="tok-str">'Group'</span>)
+  g[<span class="tok-str">'name'</span>].<span class="tok-fn">setValue</span>(<span class="tok-str">'NS_SmartGrade'</span>)
+  <span class="tok-kw">with</span> g:
+    inp = nuke.<span class="tok-fn">createNode</span>(<span class="tok-str">'Input'</span>)
+    grade = nuke.<span class="tok-fn">createNode</span>(<span class="tok-str">'Grade'</span>)
+    grade.<span class="tok-fn">setInput</span>(<span class="tok-nb">0</span>, inp)
+  <span class="tok-kw">return</span> g</div>
+          <div class="repo-footer">
+            <div class="repo-tags">
+              <span class="tag">Nuke</span>
+              <span class="tag">Python</span>
+              <span class="tag">Gizmo</span>
+            </div>
+            <!-- ↓ Replace href with your actual download URL -->
+            <a href="YOUR_DOWNLOAD_LINK_HERE" class="repo-download" download>
+              <span class="dl-icon">↓</span> Download
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="repo-card reveal">
+          <div class="repo-header">
+            <div class="repo-dot repo-dot-r"></div>
+            <div class="repo-dot repo-dot-y"></div>
+            <div class="repo-dot repo-dot-g"></div>
+            <span class="repo-filename">ns_autowrite.py</span>
+          </div>
+          <div class="repo-code"><span class="tok-cm"># Auto-Write: generates versioned
+# output paths from shot metadata</span>
+
+<span class="tok-kw">import</span> nuke, os, re
+
+<span class="tok-kw">def</span> <span class="tok-fn">auto_write_path</span>(node):
+  root = nuke.<span class="tok-fn">root</span>()
+  name = root[<span class="tok-str">'name'</span>].<span class="tok-fn">value</span>()
+  ver = re.<span class="tok-fn">findall</span>(
+    <span class="tok-str">r'v(\d+)'</span>, name)
+  v = ver[<span class="tok-nb">-1</span>] <span class="tok-kw">if</span> ver <span class="tok-kw">else</span> <span class="tok-str">'001'</span>
+  <span class="tok-kw">return</span> <span class="tok-fn">f</span><span class="tok-str">'/renders/v{v}/####.exr'</span></div>
+          <div class="repo-footer">
+            <div class="repo-tags">
+              <span class="tag">Pipeline</span>
+              <span class="tag">Python</span>
+            </div>
+            <a href="YOUR_DOWNLOAD_LINK_HERE" class="repo-download" download>
+              <span class="dl-icon">↓</span> Download
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="repo-card reveal">
+          <div class="repo-header">
+            <div class="repo-dot repo-dot-r"></div>
+            <div class="repo-dot repo-dot-y"></div>
+            <div class="repo-dot repo-dot-g"></div>
+            <span class="repo-filename">ns_relight.gizmo</span>
+          </div>
+          <div class="repo-code"><span class="tok-cm"># Relighting gizmo using normal
+# pass + customisable light direction</span>
+
+<span class="tok-kw">def</span> <span class="tok-fn">build_relight</span>():
+  g = nuke.<span class="tok-fn">createNode</span>(<span class="tok-str">'Group'</span>)
+  g[<span class="tok-str">'name'</span>].<span class="tok-fn">setValue</span>(<span class="tok-str">'NS_Relight'</span>)
+  <span class="tok-cm"># Knobs: light_dir, light_col,
+  # normal_gain, diffuse_mix</span>
+  <span class="tok-kw">for</span> k <span class="tok-kw">in</span> [<span class="tok-str">'light_dir'</span>,
+             <span class="tok-str">'light_col'</span>]:
+    g.<span class="tok-fn">addKnob</span>(nuke.<span class="tok-fn">XY_Knob</span>(k))</div>
+          <div class="repo-footer">
+            <div class="repo-tags">
+              <span class="tag">Nuke</span>
+              <span class="tag">Gizmo</span>
+              <span class="tag">Lighting</span>
+            </div>
+            <a href="YOUR_DOWNLOAD_LINK_HERE" class="repo-download" download>
+              <span class="dl-icon">↓</span> Download
+            </a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ============================================================
+       AI R&D SECTION
+       ============================================================ -->
+  <section id="ailab">
+    <div class="container">
+      <p class="section-label reveal">Experiments</p>
+      <h2 class="section-title reveal">AI R&D</h2>
+
+      <!--
+        HOW TO CUSTOMISE:
+        Replace .ai-img-placeholder with <img> or <video> tags.
+        Update .ai-badge, .ai-title, and .ai-desc text.
+        Add/remove .ai-card blocks. Use .featured for wide cards.
+      -->
+      <div class="ailab-grid">
+
+        <!-- FEATURED CARD -->
+        <div class="ai-card featured reveal">
+          <div class="ai-img-placeholder">
+            <!-- ↓ REPLACE:
+            <img src="ai_featured.jpg" alt="AI Short Film" class="ai-img" />
+            -->
+            <div class="placeholder-text">[ Featured AI short film / ComfyUI output ]<br>Recommended: 1200×514px</div>
+          </div>
+          <div class="ai-card-body">
+            <span class="ai-badge">ComfyUI · Short Film</span>
+            <div class="ai-title">Project Title — Your AI Short Film Name Here</div>
+            <div class="ai-desc">
+              A cinematic short entirely generated through ComfyUI workflows,
+              combining ControlNet, IP-Adapter, and custom SDXL checkpoints.
+              Describe what makes this project unique.
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2 -->
+        <div class="ai-card reveal">
+          <div class="ai-img-placeholder">
+            <div class="placeholder-text">[ AI image output ]<br>540×304px</div>
+          </div>
+          <div class="ai-card-body">
+            <span class="ai-badge">Stable Diffusion</span>
+            <div class="ai-title">Stylised Environment Generation</div>
+            <div class="ai-desc">Photorealistic SDXL environments for previs and concept art.</div>
+          </div>
+        </div>
+
+        <!-- CARD 3 -->
+        <div class="ai-card reveal">
+          <div class="ai-img-placeholder">
+            <div class="placeholder-text">[ ComfyUI workflow ]<br>540×304px</div>
+          </div>
+          <div class="ai-card-body">
+            <span class="ai-badge">ComfyUI Workflow</span>
+            <div class="ai-title">AI-Assisted Rotoscoping Pipeline</div>
+            <div class="ai-desc">Integrating SAM 2 and ComfyUI nodes to accelerate roto in production.</div>
+          </div>
+        </div>
+
+        <!-- CARD 4 -->
+        <div class="ai-card reveal">
+          <div class="ai-img-placeholder">
+            <div class="placeholder-text">[ AI texture gen ]<br>540×304px</div>
+          </div>
+          <div class="ai-card-body">
+            <span class="ai-badge">Texture Generation</span>
+            <div class="ai-title">Procedural AI Texture Sets</div>
+            <div class="ai-desc">On-demand PBR texture generation for fast CG set extension.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ============================================================
+       CONTACT FOOTER
+       ============================================================ -->
+  <footer id="contact">
+    <div class="container">
+      <div class="contact-inner">
+
+        <!-- Heading -->
+        <div class="reveal">
+          <p class="section-label">Let's Work Together</p>
+          <h2 class="contact-heading">
+            Ready to<br>build something
+            <em>extraordinary?</em>
+          </h2>
+        </div>
+
+        <!-- Contact links -->
+        <div class="contact-links reveal">
+
+          <!-- ↓ REPLACE the href and text with your real details -->
+
+          <a href="mailto:your.email@example.com" class="contact-link-item">
+            <div class="contact-link-icon">✉</div>
+            <div class="contact-link-text">
+              <div class="contact-link-label">Email</div>
+              <!-- ↓ Replace with your email address -->
+              <div class="contact-link-value">your.email@example.com</div>
+            </div>
+            <div class="contact-link-arrow">→</div>
+          </a>
+
+          <a href="tel:+910000000000" class="contact-link-item">
+            <div class="contact-link-icon">☎</div>
+            <div class="contact-link-text">
+              <div class="contact-link-label">Phone</div>
+              <!-- ↓ Replace with your phone number -->
+              <div class="contact-link-value">+91 00000 00000</div>
+            </div>
+            <div class="contact-link-arrow">→</div>
+          </a>
+
+          <a href="https://linkedin.com/in/YOUR_LINKEDIN_HANDLE" target="_blank" rel="noopener" class="contact-link-item">
+            <div class="contact-link-icon">in</div>
+            <div class="contact-link-text">
+              <div class="contact-link-label">LinkedIn</div>
+              <!-- ↓ Replace with your LinkedIn URL -->
+              <div class="contact-link-value">linkedin.com/in/nikhilsrivastwa</div>
+            </div>
+            <div class="contact-link-arrow">→</div>
+          </a>
+
+          <a href="https://www.imdb.com/name/YOUR_IMDB_ID/" target="_blank" rel="noopener" class="contact-link-item">
+            <div class="contact-link-icon" style="font-family:var(--font-display);font-size:0.7rem;font-weight:900;">IMDb</div>
+            <div class="contact-link-text">
+              <div class="contact-link-label">IMDb</div>
+              <!-- ↓ Replace with your IMDb URL -->
+              <div class="contact-link-value">imdb.com/name/YOUR_IMDB_ID</div>
+            </div>
+            <div class="contact-link-arrow">→</div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- Footer bar -->
+      <div class="footer-bar">
+        <p class="footer-copy">© 2025 Nikhil Srivastwa. All rights reserved.</p>
+        <p class="footer-craft">Crafted with <span>♥</span> & Python</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ============================================================
+       JAVASCRIPT
+       ============================================================ -->
+  <script>
+    /* ----------------------------------------------------------
+       CUSTOM CURSOR
+       ---------------------------------------------------------- */
+    const dot  = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      dot.style.left = mx + 'px';
+      dot.style.top  = my + 'px';
+    });
+    // Ring follows with slight lag
+    (function animRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top  = ry + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    // Expand ring on hover of interactive elements
+    document.querySelectorAll('a, button, [data-slider]').forEach(el => {
+      el.addEventListener('mouseenter', () => {
+        ring.style.width  = '60px';
+        ring.style.height = '60px';
+        ring.style.borderColor = 'rgba(245,166,35,1)';
+      });
+      el.addEventListener('mouseleave', () => {
+        ring.style.width  = '36px';
+        ring.style.height = '36px';
+        ring.style.borderColor = 'rgba(245,166,35,0.6)';
+      });
+    });
+
+    /* ----------------------------------------------------------
+       NAV — sticky background on scroll
+       ---------------------------------------------------------- */
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    /* ----------------------------------------------------------
+       MOBILE NAV TOGGLE
+       ---------------------------------------------------------- */
+    const toggle    = document.getElementById('nav-toggle');
+    const mobileNav = document.getElementById('nav-mobile');
+    toggle.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('open');
+      toggle.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', open);
+    });
+    function closeMobileNav() {
+      mobileNav.classList.remove('open');
+      toggle.classList.remove('open');
+      toggle.setAttribute('aria-expanded', 'false');
+    }
+
+    /* ----------------------------------------------------------
+       SHOWREEL MODAL
+       ---------------------------------------------------------- */
+    const modal      = document.getElementById('showreel-modal');
+    const playBtn    = document.getElementById('play-showreel-btn');
+    const closeBtn   = document.getElementById('modal-close-btn');
+
+    playBtn.addEventListener('click', () => modal.classList.add('open'));
+    closeBtn.addEventListener('click', () => modal.classList.remove('open'));
+    modal.addEventListener('click', e => {
+      if (e.target === modal) modal.classList.remove('open');
+    });
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') modal.classList.remove('open');
+    });
+
+    /* ----------------------------------------------------------
+       BEFORE / AFTER SLIDER
+       Each .shot-card[data-slider] gets an independent slider.
+       ---------------------------------------------------------- */
+    document.querySelectorAll('[data-slider]').forEach(card => {
+      const after  = card.querySelector('.shot-after');
+      const handle = card.querySelector('.shot-handle');
+      let dragging = false;
+      let pct = 50; // start at 50%
+
+      function setSlider(x) {
+        const rect = card.getBoundingClientRect();
+        pct = Math.min(100, Math.max(0, ((x - rect.left) / rect.width) * 100));
+        after.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+        handle.style.left    = pct + '%';
+      }
+
+      // Mouse events
+      card.addEventListener('mousedown', e => {
+        dragging = true;
+        setSlider(e.clientX);
+        e.preventDefault();
+      });
+      window.addEventListener('mousemove', e => {
+        if (dragging) setSlider(e.clientX);
+      });
+      window.addEventListener('mouseup', () => { dragging = false; });
+
+      // Touch events (mobile)
+      card.addEventListener('touchstart', e => {
+        dragging = true;
+        setSlider(e.touches[0].clientX);
+      }, { passive: true });
+      window.addEventListener('touchmove', e => {
+        if (dragging) setSlider(e.touches[0].clientX);
+      }, { passive: true });
+      window.addEventListener('touchend', () => { dragging = false; });
+
+      // Initialise at 50%
+      setSlider(card.getBoundingClientRect().left + card.offsetWidth * 0.5);
+    });
+
+    /* ----------------------------------------------------------
+       SCROLL REVEAL
+       IntersectionObserver adds .visible to .reveal elements.
+       ---------------------------------------------------------- */
+    const revealEls = document.querySelectorAll('.reveal');
+    const observer  = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target); // fire once
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach((el, i) => {
+      el.style.transitionDelay = (i % 3) * 0.08 + 's'; // stagger
+      observer.observe(el);
+    });
+  </script>
+
+</body>
+</html>
